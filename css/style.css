@@ -1,0 +1,152 @@
+/* DISTORSI — gaya neon sinematik */
+:root{
+  --bg:#05060d; --tx:#eef0ff; --mu:#8d92b3; --c1:#22d3ee; --c2:#a78bfa; --c3:#f472b6; --ok:#4ade80; --bad:#fb7185;
+  --glass:rgba(16,18,36,.72); --line:rgba(255,255,255,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{height:100%;height:100dvh;background:var(--bg);color:var(--tx);overflow:hidden;overscroll-behavior:none;touch-action:none;-webkit-touch-callout:none;-webkit-text-size-adjust:100%;
+  font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;user-select:none;-webkit-user-select:none}
+.muted{color:var(--mu)} .g{color:var(--ok)} .r{color:var(--bad)}
+body{display:grid;place-items:center}
+kbd{background:rgba(255,255,255,.1);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:0 6px;font:.82em ui-monospace,monospace;margin:0 1px}
+
+/* Latar aurora bergerak */
+.aurora{position:fixed;inset:-20%;z-index:0;filter:blur(60px);opacity:.55;
+  background:radial-gradient(40% 40% at 20% 25%,rgba(34,211,238,.35),transparent 70%),
+             radial-gradient(40% 40% at 80% 20%,rgba(167,139,250,.35),transparent 70%),
+             radial-gradient(45% 45% at 55% 85%,rgba(244,114,182,.28),transparent 70%);
+  animation:drift 18s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translate3d(4%,3%,0) rotate(6deg) scale(1.08)}}
+
+/* Panggung */
+.stage{position:relative;z-index:1;--ar:1.6;aspect-ratio:var(--ar);width:min(100vw,calc(100vh*var(--ar)));width:min(100vw,calc(100dvh*var(--ar)));max-height:100vh;max-height:100dvh;
+  border-radius:clamp(0px,1.4vw,18px);overflow:hidden;background:#04050b;
+  box-shadow:0 0 0 1px var(--line),0 30px 120px -20px rgba(120,90,255,.45)}
+#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+
+/* HUD */
+.hud{position:absolute;inset:0 0 auto 0;display:flex;justify-content:space-between;align-items:flex-start;padding:max(clamp(6px,1.4vw,16px),env(safe-area-inset-top)) max(clamp(6px,1.4vw,16px),env(safe-area-inset-right)) 0 max(clamp(6px,1.4vw,16px),env(safe-area-inset-left));pointer-events:none;gap:8px;z-index:10}
+.hud>div{display:flex;flex-direction:column;gap:6px}
+.hud-l{align-items:flex-start}.hud-c{align-items:center}.hud-r{align-items:flex-end;position:relative}
+.hearts{display:flex;gap:4px;font-size:clamp(16px,2.4vw,26px)}
+.hearts span{transition:transform .25s,filter .25s,opacity .25s}
+.hearts .full{color:#fb7185;filter:drop-shadow(0 0 8px #fb7185)}
+.hearts .empty{color:#3b3f5c;transform:scale(.8)}
+.hearts .pop{animation:heartpop .5s}
+@keyframes heartpop{40%{transform:scale(1.6)}}
+.dashwrap{display:flex;align-items:center;gap:8px;color:var(--mu);font-size:.75rem}
+.dash{--p:100;width:clamp(30px,4vw,42px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;
+  background:conic-gradient(var(--c1) calc(var(--p)*1%),rgba(255,255,255,.1) 0);position:relative;transition:filter .2s}
+.dash::before{content:"";position:absolute;inset:4px;border-radius:50%;background:#0a0c1c}
+.dash span{position:relative;font-size:clamp(12px,1.8vw,18px)}
+.dash.ready{filter:drop-shadow(0 0 10px var(--c1));animation:readyp 1.4s infinite}
+@keyframes readyp{50%{filter:drop-shadow(0 0 18px var(--c1))}}
+.wave{font-size:clamp(10px,1.3vw,13px);letter-spacing:.3em;color:var(--mu)}
+.wave b{color:#fff;font-size:1.5em;letter-spacing:0;margin-left:6px}
+.laws{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:46vw}
+.law{position:relative;width:clamp(24px,3vw,34px);aspect-ratio:1;border-radius:10px;display:grid;place-items:center;font-size:clamp(12px,1.7vw,18px);
+  background:rgba(255,255,255,.07);border:1px solid var(--line);animation:lawin .4s}
+.law i{position:absolute;right:-4px;bottom:-4px;font:700 10px/1 system-ui;font-style:normal;background:var(--c2);color:#05060d;border-radius:8px;padding:2px 5px}
+@keyframes lawin{from{transform:scale(0) rotate(-90deg)}}
+.score{font:800 clamp(20px,3.4vw,36px)/1 system-ui;letter-spacing:-.02em;background:linear-gradient(90deg,#fff,var(--c1));-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
+.score.bump{animation:bump .18s}
+@keyframes bump{50%{transform:scale(1.12)}}
+.combo{height:1.2em;font-weight:800;color:var(--c3);text-shadow:0 0 14px var(--c3);font-size:clamp(11px,1.6vw,16px)}
+.icon-btn{pointer-events:auto;cursor:pointer;background:rgba(0,0,0,.35);border:1px solid var(--line);color:#fff;border-radius:10px;padding:2px 9px;font-size:14px;min-width:34px;min-height:32px;touch-action:manipulation}
+.hud-r{flex-direction:column}
+.hbtns{display:flex;gap:6px;margin-top:2px}
+
+/* Banner gelombang */
+.banner{position:absolute;left:0;right:0;top:36%;text-align:center;pointer-events:none;font:900 clamp(26px,6vw,64px)/1 system-ui;letter-spacing:.1em;opacity:0;
+  text-shadow:0 0 30px var(--c2),0 0 60px var(--c3)}
+.banner small{display:block;font:500 clamp(11px,1.6vw,16px)/1.4 system-ui;letter-spacing:.2em;color:var(--mu);margin-top:8px;text-shadow:none}
+.banner.show{animation:banner 2s ease forwards}
+@keyframes banner{0%{opacity:0;transform:scale(1.5);letter-spacing:.4em}20%{opacity:1;transform:scale(1);letter-spacing:.1em}80%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+
+/* Panel & overlay */
+.panel{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:clamp(10px,3vw,40px);
+  background:radial-gradient(80% 80% at 50% 40%,rgba(10,12,30,.7),rgba(3,4,10,.94));backdrop-filter:blur(6px);animation:fadein .4s;overflow:auto;text-align:center}
+@keyframes fadein{from{opacity:0;transform:scale(1.02)}}
+.panel.small{gap:18px}
+h2{font-size:clamp(20px,3.4vw,34px);letter-spacing:.04em}
+.tag{color:var(--mu);font-size:clamp(12px,1.8vw,18px)}
+
+/* Logo glitch */
+.logo{position:relative;font:900 clamp(40px,10vw,110px)/1 system-ui;letter-spacing:.06em;
+  background:linear-gradient(90deg,var(--c1),var(--c2),var(--c3),var(--c1));background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:flow 6s linear infinite}
+@keyframes flow{to{background-position:300% 0}}
+.logo::before,.logo::after{content:attr(data-text);position:absolute;inset:0;background:inherit;-webkit-background-clip:text;background-clip:text;color:transparent;opacity:.7}
+.logo::before{animation:glitch1 3.2s infinite steps(1);clip-path:inset(0 0 60% 0)}
+.logo::after{animation:glitch2 2.7s infinite steps(1);clip-path:inset(60% 0 0 0)}
+@keyframes glitch1{0%,92%,100%{transform:none}93%{transform:translate(-6px,2px)}96%{transform:translate(5px,-2px)}}
+@keyframes glitch2{0%,88%,100%{transform:none}89%{transform:translate(6px,-2px)}94%{transform:translate(-5px,3px)}}
+
+.btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn{cursor:pointer;color:#fff;font:700 clamp(13px,1.8vw,17px) system-ui;padding:clamp(9px,1.4vw,14px) clamp(16px,2.6vw,30px);border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.08);transition:transform .15s,box-shadow .25s,background .25s}
+.btn:hover{transform:translateY(-3px);background:rgba(255,255,255,.15)} .btn:active{transform:scale(.96)}
+.btn:focus-visible,.icon-btn:focus-visible,.card:focus-visible,input:focus-visible{outline:3px solid var(--c1);outline-offset:3px}
+.btn-main{border:0;background:linear-gradient(90deg,var(--c2),var(--c3));box-shadow:0 10px 40px -10px var(--c3)}
+.btn-main:hover{background:linear-gradient(90deg,var(--c2),var(--c3));box-shadow:0 16px 50px -8px var(--c3)}
+.cols{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;width:min(900px,100%);text-align:left}
+.box{background:var(--glass);border:1px solid var(--line);border-radius:16px;padding:clamp(10px,1.6vw,18px)}
+.box h3{font-size:clamp(12px,1.6vw,15px);letter-spacing:.12em;text-transform:uppercase;color:var(--c1);margin-bottom:8px}
+.how{list-style:none;display:grid;gap:6px;font-size:clamp(11px,1.45vw,14px);color:#c9cdea}
+.board{list-style:none;counter-reset:r;display:grid;gap:5px;font-size:clamp(11px,1.5vw,15px)}
+.board li{counter-increment:r;display:flex;justify-content:space-between;gap:10px;padding:5px 10px;border-radius:8px;background:rgba(255,255,255,.05)}
+.board li::before{content:counter(r);color:var(--c3);font-weight:800;width:1.2em}
+.board li span:nth-child(1){flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.board li.none{color:var(--mu);justify-content:center}.board li.none::before{content:none}
+
+/* Kartu hukum */
+.cardlist{display:flex;gap:clamp(8px,1.6vw,20px);justify-content:center;flex-wrap:wrap;perspective:900px;width:100%}
+.card{width:clamp(150px,27%,260px);text-align:left;cursor:pointer;color:inherit;font:inherit;background:linear-gradient(160deg,rgba(255,255,255,.1),rgba(255,255,255,.03));border:1px solid var(--line);border-radius:18px;padding:clamp(10px,1.6vw,20px);
+  transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s,border-color .3s;animation:cardin .55s cubic-bezier(.2,.8,.2,1) backwards;position:relative;overflow:hidden}
+.card:nth-child(2){animation-delay:.1s}.card:nth-child(3){animation-delay:.2s}
+@keyframes cardin{from{opacity:0;transform:translateY(40px) rotateX(35deg)}}
+.card:hover,.card:focus-visible{transform:translateY(-10px) rotateX(5deg) scale(1.03);border-color:var(--c2);box-shadow:0 24px 60px -16px var(--c2)}
+.card::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.16) 50%,transparent 60%);transform:translateX(-120%);transition:transform .7s}
+.card:hover::after{transform:translateX(120%)}
+.card .ico{font-size:clamp(26px,4vw,44px)}
+.card h4{font-size:clamp(13px,1.7vw,18px);margin:4px 0}
+.card .lv{font-size:.72rem;letter-spacing:.12em;color:var(--c1);text-transform:uppercase}
+.card p{font-size:clamp(10px,1.3vw,13px);margin-top:6px;color:#cfd3f0;line-height:1.4}
+.card p.b::before{content:"＋ ";color:var(--ok);font-weight:900}.card p.h::before{content:"－ ";color:var(--bad);font-weight:900}
+.card .key{position:absolute;top:10px;right:12px;font:700 .72rem ui-monospace,monospace;color:var(--mu);border:1px solid var(--line);border-radius:6px;padding:0 6px}
+
+/* Game over */
+.over-t{color:var(--bad);text-shadow:0 0 30px var(--bad);letter-spacing:.14em;animation:glitch1 2s infinite steps(1)}
+.final b{display:block;font:900 clamp(40px,9vw,88px)/1 system-ui;background:linear-gradient(90deg,#fff,var(--c1));-webkit-background-clip:text;background-clip:text;color:transparent}
+.final small{color:var(--mu);letter-spacing:.3em;text-transform:uppercase}
+.nameform label{display:block;color:var(--c1);margin-bottom:6px;font-size:.9rem}
+.row{display:flex;gap:8px;justify-content:center}
+input{font:inherit;color:#fff;background:rgba(255,255,255,.08);border:1px solid var(--line);border-radius:12px;padding:10px 14px;width:200px;user-select:text;-webkit-user-select:text}
+
+/* Kontrol sentuh: joystick melayang di sisi kiri, ketuk sisi kanan = dash */
+.touch{position:fixed;inset:0;z-index:5;touch-action:none;-webkit-user-select:none;user-select:none}
+.stick{position:fixed;left:0;top:0;width:132px;height:132px;margin:-66px 0 0 -66px;border-radius:50%;background:radial-gradient(circle,rgba(34,211,238,.10),rgba(255,255,255,.04));
+  border:2px solid rgba(34,211,238,.45);opacity:0;transform:scale(.7);transition:opacity .15s,transform .15s;pointer-events:none;box-shadow:0 0 30px rgba(34,211,238,.25)}
+.stick.on{opacity:1;transform:scale(1)}
+.knob{position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px 0 0 -24px;border-radius:50%;background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 0 24px var(--c1)}
+.dashhint{position:fixed;right:max(4vw,env(safe-area-inset-right));bottom:max(6vh,env(safe-area-inset-bottom));width:clamp(70px,22vh,110px);aspect-ratio:1;border-radius:50%;display:grid;place-content:center;text-align:center;
+  font:800 clamp(11px,3vh,15px) system-ui;border:2px dashed rgba(244,114,182,.55);background:rgba(244,114,182,.10);color:#fbcfe8;pointer-events:none;transition:transform .1s,background .1s,box-shadow .1s;opacity:.85}
+.dashhint small{font:500 9px/1.2 system-ui;color:var(--mu);margin-top:3px}
+.dashhint.press{transform:scale(.9);background:rgba(244,114,182,.35);box-shadow:0 0 34px rgba(244,114,182,.7)}
+
+/* Chip pengaturan */
+.settings{gap:8px}
+.chipbtn{cursor:pointer;color:#dfe3ff;font:600 clamp(11px,1.5vw,14px) system-ui;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);transition:.2s;touch-action:manipulation;min-height:36px}
+.chipbtn:hover{background:rgba(255,255,255,.14);border-color:var(--c1)} .chipbtn:focus-visible{outline:3px solid var(--c1);outline-offset:2px}
+
+/* Peringatan putar layar (hanya perangkat sentuh dalam mode potret) */
+.rotate{position:fixed;inset:0;z-index:999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(3,4,10,.97);text-align:center;padding:20px}
+.rotate b{font-size:1.3rem}.rotate small{color:var(--mu)}
+.rot-ico{font-size:64px;animation:rot 1.8s ease-in-out infinite}
+@keyframes rot{0%,20%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
+@media (orientation:portrait) and (pointer:coarse){.rotate{display:flex}}
+@media (pointer:coarse){.icon-btn{min-width:44px;min-height:44px;font-size:18px}.btn{min-height:46px}.panel{touch-action:pan-y}}
+.panel{touch-action:pan-y;-webkit-overflow-scrolling:touch;z-index:20}
+
+@media (max-width:720px){.cols{grid-template-columns:1fr}.how li:nth-child(n+4){display:none}.laws{max-width:40vw}}
+@media (max-height:520px){.logo{font-size:44px}.tag,.how li:nth-child(n+3){display:none}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.banner.show{opacity:1}}

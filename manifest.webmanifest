@@ -1,0 +1,20 @@
+{
+  "name": "DISTORSI — Tulis Ulang Hukum Semesta",
+  "short_name": "DISTORSI",
+  "description": "Game aksi arena: bengkokkan hukum fisika di tengah badai peluru.",
+  "lang": "id",
+  "start_url": "./index.html",
+  "scope": "./",
+  "id": "./index.html",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "landscape",
+  "background_color": "#05060d",
+  "theme_color": "#05060d",
+  "categories": ["games"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

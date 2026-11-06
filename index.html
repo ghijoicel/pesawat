@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; manifest-src 'self'; worker-src 'self'">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#05060d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DISTORSI">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<title>DISTORSI — Tulis Ulang Hukum Semesta</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="js/engine.js" defer></script>
+<script src="js/ui.js" defer></script>
+</head>
+<body>
+<div class="aurora" aria-hidden="true"></div>
+<main id="stage" class="stage">
+  <canvas id="game" aria-label="Arena permainan DISTORSI" role="img"></canvas>
+
+  <div id="hud" class="hud" hidden>
+    <div class="hud-l">
+      <div id="hearts" class="hearts" aria-label="Nyawa"></div>
+      <div class="dashwrap"><div id="dash" class="dash"><span>⚡</span></div><small>Dash</small></div>
+    </div>
+    <div class="hud-c">
+      <div class="wave">GELOMBANG <b id="wave">1</b></div>
+      <div id="laws" class="laws" aria-label="Hukum aktif"></div>
+    </div>
+    <div class="hud-r">
+      <div class="score" id="score">0</div>
+      <div class="combo" id="combo"></div>
+      <div class="hbtns">
+        <button id="btn-pause" class="icon-btn" aria-label="Jeda">⏸</button>
+        <button class="icon-btn js-mute" aria-label="Suara">🔊</button>
+        <button class="icon-btn js-full" aria-label="Layar penuh">⛶</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="banner" class="banner" aria-live="polite"></div>
+
+  <section id="menu" class="panel menu">
+    <h1 class="logo" data-text="DISTORSI">DISTORSI</h1>
+    <p class="tag">Tulis ulang hukum fisika di tengah badai peluru.</p>
+    <div class="btns">
+      <button id="btn-play" class="btn btn-main">▶ Main</button>
+      <button id="btn-daily" class="btn">📅 Tantangan Harian</button>
+    </div>
+    <div class="btns settings" role="group" aria-label="Pengaturan">
+      <button class="chipbtn js-full">⛶ Layar Penuh</button>
+      <button class="chipbtn js-mute">🔊 Suara: Aktif</button>
+      <button id="btn-vib" class="chipbtn">📳 Getar: Aktif</button>
+      <button id="btn-gfx" class="chipbtn">🎚 Grafis: Otomatis</button>
+      <button id="btn-install" class="chipbtn" hidden>📲 Pasang Aplikasi</button>
+    </div>
+    <div class="cols">
+      <div class="box">
+        <h3>Cara Bermain</h3>
+        <ul class="how">
+          <li><kbd>W A S D</kbd> / panah untuk bergerak. Tembakan <b>otomatis</b> membidik musuh terdekat.</li>
+          <li><kbd>Spasi</kbd> / <kbd>Shift</kbd> untuk <b>Dash</b>: kebal sesaat dan melukai musuh yang ditembus.</li>
+          <li>Tiap gelombang selesai, pilih <b>1 dari 3 Hukum Semesta</b>. Setiap hukum punya <span class="g">untung</span> dan <span class="r">harga</span>.</li>
+          <li>Kumpulkan serpihan: 8 serpihan memulihkan 1 nyawa. Bunuh beruntun untuk kombo.</li>
+          <li><kbd>P</kbd> / <kbd>Esc</kbd> jeda · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> pilih kartu.</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>🏆 Papan Skor Lokal</h3>
+        <ol id="board" class="board"></ol>
+      </div>
+    </div>
+  </section>
+
+  <section id="cards" class="panel cardsp" hidden>
+    <h2>Pilih Hukum Semesta</h2>
+    <p class="muted">Setiap hukum mengubah cara dunia bekerja. Pilih dengan bijak.</p>
+    <div id="cards-list" class="cardlist"></div>
+  </section>
+
+  <section id="pause" class="panel small" hidden>
+    <h2>Dijeda</h2>
+    <div class="btns">
+      <button id="btn-resume" class="btn btn-main">Lanjut</button>
+      <button id="btn-quit" class="btn">Keluar ke Menu</button>
+    </div>
+    <div class="btns settings"><button class="chipbtn js-full">⛶ Layar Penuh</button><button class="chipbtn js-mute">🔊 Suara: Aktif</button></div>
+  </section>
+
+  <section id="over" class="panel small" hidden>
+    <h2 class="over-t">SEMESTA RUNTUH</h2>
+    <div class="final"><b id="f-score">0</b><small>skor</small></div>
+    <p class="muted" id="f-info"></p>
+    <form id="name-form" class="nameform" autocomplete="off" hidden>
+      <label for="name">Rekor baru! Masukkan namamu</label>
+      <div class="row"><input id="name" maxlength="12" placeholder="Nama (maks 12)" spellcheck="false"><button class="btn btn-main">Simpan</button></div>
+    </form>
+    <div class="btns">
+      <button id="btn-again" class="btn btn-main">↻ Main Lagi</button>
+      <button id="btn-menu" class="btn">Menu</button>
+    </div>
+  </section>
+
+</main>
+<div id="touch" class="touch" hidden>
+  <div id="stick" class="stick"><div id="knob" class="knob"></div></div>
+  <div class="dashhint">⚡ DASH<small>ketuk sisi kanan</small></div>
+</div>
+<div id="rotate" class="rotate" role="alert"><div class="rot-ico">📱</div><b>Putar ke mode landscape</b><small>Game dijeda sampai layar diputar</small></div>
+</body>
+</html>
